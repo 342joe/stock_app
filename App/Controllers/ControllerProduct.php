@@ -13,24 +13,27 @@ class ControllerProduct
     public function index()
     {
         $product = $this->productModel->getAll();
+        $view = 'list';
         require_once './App/Views/Product/index.php';
     } 
 
     public function store()
     {
+        $view = 'create';
         if($_SERVER['REQUEST_METHOD'] === 'POST')
             {
-                $name = htmlspecialchars($_POST['name']);
-                $description = htmlspecialchars($_POST['description']);
-                $price = htmlspecialchars( $_POST['price']);
-                $purchase_price = htmlspecialchars($_POST['purchase_price']);
-                $quantity = htmlspecialchars($_POST['quantity']);
-                $barcode = htmlspecialchars($_POST['barcode']);
-                $category_id = htmlspecialchars($_POST['category_id']);
-                $created_at = htmlspecialchars($_POST['created_at']);
-
-                $result = $this->productModel->create(
-                    $name,$description,$price,$purchase_price,$quantity,$barcode,$category_id,$created_at);
+            
+            $data =[
+                'name' => htmlspecialchars($_POST['name']),
+                'description' => htmlspecialchars($_POST['description']),
+                'price' => htmlspecialchars( $_POST['price']),
+                'purchase_price' => htmlspecialchars($_POST['purchase_price']),
+                'quantity' => htmlspecialchars($_POST['quantity']),
+                'barcode' => htmlspecialchars($_POST['barcode']),
+                'category_id' => htmlspecialchars($_POST['category_id']),
+                'created_at' => htmlspecialchars($_POST['created_at']),
+            ];
+                $result = $this->productModel->create($data);
                     if($result)
                         {
                             header("Location: index.php?action=products");
@@ -46,26 +49,27 @@ class ControllerProduct
     {
         if($_SERVER['REQUEST_METHOD'] === 'POST')
             {
-                $id = $_POST['id'];
-                $name = $_POST['name'];
-                $description = $_POST['description'];
-                $price = $_POST['price'];
-                $purchase_price = $_POST['purchase_price'];
-                $quantity = $_POST['quantity'];
-                $barcode = $_POST['barcode'];
-                $category_id = $_POST['category_id'];
-                $created_at = $_POST['created_at'];
-
-                $result = $this->productModel->update(
-                    $id,$name,$description,$price,$purchase_price,$quantity,$barcode,$category_id,$created_at);
+              $data=[
+                  'id' => $_POST['id'],
+                'name' => $_POST['name'],
+                'description' =>$_POST['description'],
+                'price' => $_POST['price'],
+                'purchase_price' => $_POST['purchase_price'],
+                'quantity' => $_POST['quantity'],
+                'barcode' => $_POST['barcode'],
+                'category_id' => $_POST['category_id'],
+                'created_at' => $_POST['created_at'],
+              ];
+                $result = $this->productModel->update($data);
                     if($result)
                         {
-                            echo "utilisateur update avec succes";
+                            echo "Produit mis à jour avec succès";
                         }else
                         {
-                            echo "Erreur lors de la mis a jour";
+                            echo "Erreur lors de la mise à jour";
                         }
             }
+            $view = 'edit';
     }
 
     public function Delete()
@@ -76,9 +80,9 @@ class ControllerProduct
                 $result = $this->productModel->delete($id);
 
                 if($result){
-                    echo "Suppression reussi avec succes";
+                    echo "Suppression réussie";
                 }else{
-                    echo "Echec de lors de la suppression";
+                    echo "chec lors de la suppression";
                 }
             }
     }

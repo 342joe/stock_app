@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/database.php';
 class Products
 {
     private $pdo;
@@ -24,7 +24,7 @@ class Products
     public function create($data)
     {
         $sql = "INSERT INTO products(
-                        id,name,
+                        name,
                         description,
                         price,
                         purchase_price,
@@ -33,7 +33,7 @@ class Products
                         category_id,
                         created_at)
                     VALUES(
-                        :id,:name,
+                        :name,
                         :description,
                         :price,:purchase_price,
                         :quantity,:barcode,
@@ -43,12 +43,11 @@ class Products
                     )";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
-            ':id' => $data['id'],
             ':name' => $data['name'],
             ':description' => $data['description'],
             ':price'=> $data['price'],
             ':purchase_price' => $data['purchase_price'],
-            ':quatity' => $data['quatity'],
+            ':quantity' => $data['quantity'],
             ':barcode' => $data['barcode'],
             ':category_id' => $data['category_id'],
             ':created_at' => $data['created_at']
@@ -67,7 +66,7 @@ class Products
                     quantity = :quantity,
                     barcode = :barcode,
                     category_id = :category_id,
-                    created_at = created_at
+                    created_at = :created_at
                 WHERE id = :id
         ";
 
