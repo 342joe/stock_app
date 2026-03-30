@@ -30,7 +30,7 @@
                     <th>ID</th>
                     <th>Nom</th>
                     <th>Description</th>
-                    <th>Prix</th>
+                    <th>Prix de vente</th>
                     <th>Achat</th>
                     <th>Qte</th>
                     <th>Barcode</th>
@@ -111,7 +111,7 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Prix :</label>
+                <label class="form-label">Prix de vente :</label>
                 <input type="number" name="price" step="0.01" class="form-control" required>
             </div>
 
@@ -146,7 +146,7 @@
             </div>
 
             <div class="col-12 text-end">
-                <button type="submit" class="btn btn-success">Créer ✅</button>
+                <button type="submit" class="btn btn-success">Créer </button>
             </div>
 
         </form>
@@ -180,7 +180,7 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Prix :</label>
+                <label class="form-label">Prix de vente :</label>
                 <input type="number" name="price" id="edit-price" step="0.01" class="form-control" required>
             </div>
 

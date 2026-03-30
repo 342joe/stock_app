@@ -26,7 +26,7 @@
             <div class="col-md-4">
                 <h5 class="fw-bold">Contact</h5>
                 <p class="mb-1">📞 +243 972 397 473</p>
-                <p class="mb-1">📧 support@stockapp.com</p>
+                <p class="mb-1">📧 jonathan.swedi@graaentreprises.com</p>
                 <p>📍 Lubumbashi, RDC</p>
             </div>
 
