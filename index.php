@@ -16,7 +16,7 @@ if (!isset($_SESSION['user']) && !in_array($action, $publicActions)) {
 require_once './App/Models/Products.php';
 require_once './App/Models/Category.php';
 require_once './App/Models/User.php';
-require_once './App/Models/Sale.php'; 
+require_once './App/Models/Sale.php';
 
 // ================= CONTROLLERS =================
 require_once './App/Controllers/ControllerProduct.php';
@@ -24,7 +24,7 @@ require_once './App/Controllers/ControllerCategory.php';
 require_once './App/Controllers/ControllerUser.php';
 require_once './App/Controllers/ControllerHome.php';
 require_once './App/Controllers/ControllerAuth.php';
-require_once './App/Controllers/ControllerSale.php'; 
+require_once './App/Controllers/ControllerSale.php';
 
 // ================= INSTANCES =================
 $controllerProduct  = new ControllerProduct();
@@ -32,7 +32,7 @@ $controllerCategory = new ControllerCategory();
 $controllerUser     = new ControllerUser();
 $controllerHome     = new ControllerHome();
 $controllerAuth     = new ControllerAuth();
-$controllerSale     = new ControllerSale(); 
+$controllerSale     = new ControllerSale();
 
 // ================= ROUTER =================
 switch ($action) {
@@ -76,6 +76,11 @@ switch ($action) {
         $controllerProduct->delete();
         break;
 
+    // ---------- SCAN CODE BARRE ----------
+    case 'product-scan':
+        $controllerProduct->scan();
+        break;
+
     // ---------- CATEGORIES ----------
     case 'categories':
         $controllerCategory->index();
@@ -93,9 +98,17 @@ switch ($action) {
         $controllerCategory->delete();
         break;
 
-    // ---------- SALES ----------
+    // ---------- SALES / POS ----------
     case 'sales':
         $controllerSale->index();
+        break;
+
+    case 'sale-add':
+        $controllerSale->addToCart();
+        break;
+
+    case 'sale-remove':
+        $controllerSale->removeFromCart();
         break;
 
     case 'sale-store':
@@ -108,6 +121,16 @@ switch ($action) {
 
     case 'my-sales':
         $controllerSale->mySales();
+        break;
+
+    // ---------- INVOICE HTML ----------
+    case 'invoice':
+        require './App/Views/Sales/invoice.php';
+        break;
+
+    // ---------- INVOICE PDF ----------
+    case 'invoice-pdf':
+        require './App/Views/Sales/invoice_pdf.php';
         break;
 
     // ---------- USERS ----------
@@ -139,4 +162,5 @@ switch ($action) {
     default:
         http_response_code(404);
         echo "<h1>404 - Page introuvable</h1>";
+        break;
 }

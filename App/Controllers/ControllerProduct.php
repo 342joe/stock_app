@@ -138,4 +138,27 @@ class ControllerProduct
 
         require './App/Views/Product/index.php';
  }
+
+ public function scan()
+{
+    header('Content-Type: application/json');
+
+    $barcode = $_GET['barcode'] ?? '';
+    if (!$barcode) {
+        echo json_encode(['success' => false]);
+        return;
+    }
+
+    $product = $this->productModel->findByBarcode($barcode);
+
+    if ($product) {
+        echo json_encode([
+            'success' => true,
+            'product' => $product
+        ]);
+    } else {
+        echo json_encode(['success' => false]);
+    }
+}
+
 }

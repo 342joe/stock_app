@@ -198,4 +198,14 @@ class Products
         $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function findByBarcode(string $barcode)
+    {
+    $stmt = $this->pdo->prepare(
+        "SELECT * FROM products WHERE barcode = :barcode LIMIT 1"
+    );
+    $stmt->execute([':barcode' => $barcode]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
 }

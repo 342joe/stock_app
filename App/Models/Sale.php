@@ -10,132 +10,146 @@ class Sale
         $this->pdo = $database->getConnection();
     }
 
-    // ================= CREATE SALE =================
     /**
-     * Enregistre une vente ET met à jour le stock
-     * Utilise une transaction pour éviter les incohérences
+     * Créer une FACTURE avec plusieurs produits (panier)
+     * $cart = [
+     *   ['product_id' => 1, 'quantity' => 2],
+     *   ['product_id' => 5, 'quantity' => 1],
+     * ]
      */
-    public function create($data)
+    public function createInvoice(array $cart, int $userId, string $paymentMethod): int
     {
         try {
-            // Démarrage transaction
             $this->pdo->beginTransaction();
 
-            //  Vérifier le stock actuel
-            $sqlStock = "SELECT quantity, price FROM products WHERE id = :product_id FOR UPDATE";
-            $stmtStock = $this->pdo->prepare($sqlStock);
-            $stmtStock->execute([
-                ':product_id' => $data['product_id']
-            ]);
-
-            $product = $stmtStock->fetch(PDO::FETCH_ASSOC);
-
-            if (!$product) {
-                throw new Exception('Produit introuvable');
-            }
-
-            if ($product['quantity'] < $data['quantity']) {
-                throw new Exception('Stock insuffisant');
-            }
-
-            //  Calcul du prix
-            $unitPrice  = $product['price'];
-            $totalPrice = $unitPrice * $data['quantity'];
-
-            //  Enregistrer la vente
-            $sqlSale = "
-                INSERT INTO sales (product_id, user_id, quantity, unit_price, total_price)
-                VALUES (:product_id, :user_id, :quantity, :unit_price, :total_price)
-            ";
-
-            $stmtSale = $this->pdo->prepare($sqlSale);
+            // 1️⃣ Créer la facture vide AVEC moyen de paiement ✅
+            $stmtSale = $this->pdo->prepare(
+                "INSERT INTO sales (user_id, total_amount, payment_method)
+                 VALUES (:user_id, 0, :payment_method)"
+            );
             $stmtSale->execute([
-                ':product_id'  => $data['product_id'],
-                ':user_id'     => $data['user_id'],
-                ':quantity'    => $data['quantity'],
-                ':unit_price'  => $unitPrice,
-                ':total_price' => $totalPrice
+                ':user_id'         => $userId,
+                ':payment_method'  => $paymentMethod
             ]);
 
-            // 4 Mettre à jour le stock
-            $sqlUpdateStock = "
-                UPDATE products
-                SET quantity = quantity - :quantity
-                WHERE id = :product_id
-            ";
+            $saleId = $this->pdo->lastInsertId();
+            $totalAmount = 0;
 
-            $stmtUpdate = $this->pdo->prepare($sqlUpdateStock);
-            $stmtUpdate->execute([
-                ':quantity'   => $data['quantity'],
-                ':product_id' => $data['product_id']
+            // 2️⃣ Traiter chaque produit du panier
+            foreach ($cart as $item) {
+
+                // Verrouillage du produit
+                $stmtProduct = $this->pdo->prepare(
+                    "SELECT price, quantity FROM products WHERE id = :id FOR UPDATE"
+                );
+                $stmtProduct->execute([':id' => $item['product_id']]);
+                $product = $stmtProduct->fetch(PDO::FETCH_ASSOC);
+
+                if (!$product) {
+                    throw new Exception("Produit introuvable");
+                }
+
+                if ($product['quantity'] < $item['quantity']) {
+                    throw new Exception("Stock insuffisant pour un produit");
+                }
+
+                $unitPrice   = $product['price'];
+                $lineTotal   = $unitPrice * $item['quantity'];
+                $totalAmount += $lineTotal;
+
+                // 3️⃣ Insérer ligne de facture
+                $stmtItem = $this->pdo->prepare(
+                    "INSERT INTO sale_items
+                     (sale_id, product_id, quantity, unit_price, total_price)
+                     VALUES (:sale_id, :product_id, :quantity, :unit_price, :total_price)"
+                );
+                $stmtItem->execute([
+                    ':sale_id'     => $saleId,
+                    ':product_id'  => $item['product_id'],
+                    ':quantity'    => $item['quantity'],
+                    ':unit_price'  => $unitPrice,
+                    ':total_price' => $lineTotal
+                ]);
+
+                // 4️⃣ Mise à jour du stock
+                $stmtUpdate = $this->pdo->prepare(
+                    "UPDATE products
+                     SET quantity = quantity - :qty
+                     WHERE id = :id"
+                );
+                $stmtUpdate->execute([
+                    ':qty' => $item['quantity'],
+                    ':id'  => $item['product_id']
+                ]);
+            }
+
+            // 5️⃣ Mettre à jour le total de la facture
+            $stmtTotal = $this->pdo->prepare(
+                "UPDATE sales SET total_amount = :total WHERE id = :id"
+            );
+            $stmtTotal->execute([
+                ':total' => $totalAmount,
+                ':id'    => $saleId
             ]);
 
-            //  Validation transaction
             $this->pdo->commit();
-
-            return true;
+            return $saleId;
 
         } catch (Exception $e) {
-            //  Annulation transaction en cas d’erreur
             $this->pdo->rollBack();
             throw $e;
         }
     }
 
-    // ================= GET ALL SALES =================
-    public function getAll()
+    // ================= FACTURE COMPLETE =================
+    public function getInvoice(int $saleId): array
     {
-        $sql = "
-            SELECT s.*, 
-                   p.name AS product_name,
-                   u.name AS seller_name
-            FROM sales s
-            JOIN products p ON s.product_id = p.id
-            JOIN users u ON s.user_id = u.id
-            ORDER BY s.created_at DESC
-        ";
+        $stmtSale = $this->pdo->prepare(
+            "SELECT s.*, u.name AS seller
+             FROM sales s
+             JOIN users u ON u.id = s.user_id
+             WHERE s.id = :id"
+        );
+        $stmtSale->execute([':id' => $saleId]);
+        $sale = $stmtSale->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $this->pdo->prepare($sql);
+        $stmtItems = $this->pdo->prepare(
+            "SELECT si.*, p.name AS product_name
+             FROM sale_items si
+             JOIN products p ON p.id = si.product_id
+             WHERE si.sale_id = :id"
+        );
+        $stmtItems->execute([':id' => $saleId]);
+
+        return [
+            'sale'  => $sale,
+            'items' => $stmtItems->fetchAll(PDO::FETCH_ASSOC),
+        ];
+    }
+
+    // ================= MES FACTURES (PAR VENDEUR) =================
+    public function getByUser(int $userId): array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT s.*
+             FROM sales s
+             WHERE s.user_id = :user_id
+             ORDER BY s.created_at DESC"
+        );
+        $stmt->execute([':user_id' => $userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // ================= HISTORIQUE GLOBAL =================
+    public function getAll(): array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT s.*, u.name AS seller_name
+             FROM sales s
+             JOIN users u ON u.id = s.user_id
+             ORDER BY s.created_at DESC"
+        );
         $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // ================= GET SALES BY USER =================
-    public function getByUser($userId)
-    {
-        $sql = "
-            SELECT s.*, p.name AS product_name
-            FROM sales s
-            JOIN products p ON s.product_id = p.id
-            WHERE s.user_id = :user_id
-            ORDER BY s.created_at DESC
-        ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':user_id' => $userId
-        ]);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // ================= GET SALES BY PRODUCT =================
-    public function getByProduct($productId)
-    {
-        $sql = "
-            SELECT s.*, u.name AS seller_name
-            FROM sales s
-            JOIN users u ON s.user_id = u.id
-            WHERE s.product_id = :product_id
-            ORDER BY s.created_at DESC
-        ";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':product_id' => $productId
-        ]);
-
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
