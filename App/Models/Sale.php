@@ -22,7 +22,7 @@ class Sale
         try {
             $this->pdo->beginTransaction();
 
-            // 1️⃣ Créer la facture vide AVEC moyen de paiement ✅
+            //  Créer la facture vide AVEC moyen de paiement 
             $stmtSale = $this->pdo->prepare(
                 "INSERT INTO sales (user_id, total_amount, payment_method)
                  VALUES (:user_id, 0, :payment_method)"
@@ -35,7 +35,7 @@ class Sale
             $saleId = $this->pdo->lastInsertId();
             $totalAmount = 0;
 
-            // 2️⃣ Traiter chaque produit du panier
+            //  Traiter chaque produit du panier
             foreach ($cart as $item) {
 
                 // Verrouillage du produit
@@ -57,7 +57,7 @@ class Sale
                 $lineTotal   = $unitPrice * $item['quantity'];
                 $totalAmount += $lineTotal;
 
-                // 3️⃣ Insérer ligne de facture
+                //  Insérer ligne de facture
                 $stmtItem = $this->pdo->prepare(
                     "INSERT INTO sale_items
                      (sale_id, product_id, quantity, unit_price, total_price)
@@ -71,7 +71,7 @@ class Sale
                     ':total_price' => $lineTotal
                 ]);
 
-                // 4️⃣ Mise à jour du stock
+                //  Mise à jour du stock
                 $stmtUpdate = $this->pdo->prepare(
                     "UPDATE products
                      SET quantity = quantity - :qty
@@ -83,7 +83,7 @@ class Sale
                 ]);
             }
 
-            // 5️⃣ Mettre à jour le total de la facture
+            //  Mettre à jour le total de la facture
             $stmtTotal = $this->pdo->prepare(
                 "UPDATE sales SET total_amount = :total WHERE id = :id"
             );

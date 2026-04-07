@@ -102,7 +102,7 @@ class ControllerSale
             exit;
         }
 
-        // ✅ RÉCUPÉRATION DU MOYEN DE PAIEMENT
+        // RÉCUPÉRATION DU MOYEN DE PAIEMENT
         $paymentMethod = $_POST['payment_method'] ?? 'cash';
 
         try {
