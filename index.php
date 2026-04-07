@@ -16,7 +16,7 @@ if (!isset($_SESSION['user']) && !in_array($action, $publicActions)) {
 require_once './App/Models/Products.php';
 require_once './App/Models/Category.php';
 require_once './App/Models/User.php';
-require_once './App/Models/Sale.php'; // ✅ AJOUT
+require_once './App/Models/Sale.php'; 
 
 // ================= CONTROLLERS =================
 require_once './App/Controllers/ControllerProduct.php';
@@ -24,7 +24,7 @@ require_once './App/Controllers/ControllerCategory.php';
 require_once './App/Controllers/ControllerUser.php';
 require_once './App/Controllers/ControllerHome.php';
 require_once './App/Controllers/ControllerAuth.php';
-require_once './App/Controllers/ControllerSale.php'; // ✅ AJOUT
+require_once './App/Controllers/ControllerSale.php'; 
 
 // ================= INSTANCES =================
 $controllerProduct  = new ControllerProduct();
@@ -32,7 +32,7 @@ $controllerCategory = new ControllerCategory();
 $controllerUser     = new ControllerUser();
 $controllerHome     = new ControllerHome();
 $controllerAuth     = new ControllerAuth();
-$controllerSale     = new ControllerSale(); // ✅ AJOUT
+$controllerSale     = new ControllerSale(); 
 
 // ================= ROUTER =================
 switch ($action) {
