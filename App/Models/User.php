@@ -10,66 +10,116 @@ class User
         $this->pdo = $database->getConnection();
     }
 
-    //CRUD//
-    
+    // ================= GET ALL USERS =================
     public function getAll()
     {
-        $sql = "SELECT * FROM users ORDER BY id DESC";
-        $stmt=$this->pdo-> prepare($sql);
-        $stmt->execute();
+    $sql = "
+        SELECT u.*, r.name AS role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        ORDER BY u.id DESC
+    ";
 
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // ================= CREATE USER =================
     public function create($data)
     {
-        $sql="INSERT INTO users(id,name,email,password,role,created_at)
-                    VALUES (:id,:name,:email,:password,:role,:created_at)";
-        $stmt=$this->pdo->prepare($sql);
-        
-        return $stmt->execute([
+        $sql = "
+            INSERT INTO users (name, email, password, role_id, created_at)
+            VALUES (:name, :email, :password, :role_id, NOW())
+        ";
 
-                ':name' => $data['name'],
-                ':email' => $data['email'],
-                ':password'=> $data['password'],
-                ':role'=> $data['role'],
-                ':created_at' => $data['created_at']
-
-
-        ]);
-        
-    }
-
-    public function update($data)
-    {
-        $sql= "UPDATE users 
-                SET name = :name,
-                    email = :email,
-                    password = :password,
-                    role = :role,
-                    created_at = :created_at
-                WHERE id = :id    
-                    ";
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
-            ':name' => htmlspecialchars($data['name']),
-            ':email' => htmlspecialchars($data['email']),
-            'password' => htmlspecialchars($data['password']),
-            ':role' => htmlspecialchars($data['role']),
-            ':created_at' => htmlspecialchars($data['created_at']),
-            ':id' => htmlspecialchars($data['id'])
+            ':name'     => $data['name'],
+            ':email'    => $data['email'],
+            ':password' => $data['password'], // déjà hashé
+            ':role_id'  => $data['role_id']
         ]);
     }
 
+    // ================= UPDATE USER =================
+    public function update($data)
+    {
+        $sql = "
+            UPDATE users
+            SET name = :name,
+                email = :email,
+                role_id = :role_id
+            WHERE id = :id
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':name'    => $data['name'],
+            ':email'   => $data['email'],
+            ':role_id' => $data['role_id'],
+            ':id'      => $data['id']
+        ]);
+    }
+
+    // ================= UPDATE PASSWORD =================
+    public function updatePassword($id, $password)
+    {
+        $sql = "UPDATE users SET password = :password WHERE id = :id";
+
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([
+            ':password' => $password,
+            ':id' => $id
+        ]);
+    }
+
+    // ================= DELETE =================
     public function delete($id)
     {
         $sql = "DELETE FROM users WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
+
         return $stmt->execute([
-            ':id'=>$id
+            ':id' => $id
         ]);
     }
 
+    // ================= AUTH =================
+    public function findByEmail($email)
+    {
+    $sql = "
+        SELECT u.*, r.name AS role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE u.email = :email
+          AND u.is_active = 1
+        LIMIT 1
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([':email' => $email]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-?>
+    // ================= ACTIVER =================
+public function activate($id)
+{
+    $sql = "UPDATE users SET is_active = 1 WHERE id = :id";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute([':id' => $id]);
+}
+
+// ================= DESACTIVER =================
+public function deactivate($id)
+{
+    $sql = "UPDATE users SET is_active = 0 WHERE id = :id";
+    $stmt = $this->pdo->prepare($sql);
+    return $stmt->execute([':id' => $id]);
+}
+
+}
