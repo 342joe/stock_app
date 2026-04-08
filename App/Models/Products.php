@@ -208,4 +208,11 @@ class Products
     return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function countAll()
+    {
+        $sql = "SELECT COUNT(*) AS total FROM products";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetch()['total'];
+    }
+
 }

@@ -122,4 +122,11 @@ public function deactivate($id)
     return $stmt->execute([':id' => $id]);
 }
 
+public function countAll()
+{
+        $sql = "SELECT COUNT(*) AS total FROM users";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetch()['total'];
+}
+
 }

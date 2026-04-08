@@ -1,3 +1,9 @@
+<?php
+// ================= CSRF TOKEN =================
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -137,19 +143,25 @@
     .app-footer {
         margin-left: 260px;
         padding: 18px 40px;
-        background: transparent;
         border-top: 1px solid rgba(0,0,0,0.06);
     }
+    /* ======================
+   FOOTER LINKS (FIX STYLE)
+====================== */
+.footer-link {
+    color: #6c757d;         /* même gris élégant */
+    text-decoration: none;  /* enlève le soulignement */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s ease;
+}
 
-    .footer-link {
-        color: #6c757d;
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
+.footer-link:hover {
+    color: #157347;         /* même vert que la sidebar */
+    text-decoration: none;
+}
 
-    .footer-link:hover {
-        color: #157347;
-    }
     </style>
 </head>
 
@@ -160,24 +172,20 @@
 ====================== -->
 <aside class="sidebar">
 
-    <!-- BRAND -->
     <div class="brand">
         <i class="bi bi-box-seam-fill"></i>
         StockApp
     </div>
 
-    <!-- NAVIGATION -->
     <nav>
 
-        <!-- ACCUEIL : TOUS -->
         <a href="index.php?action=home"
            class="<?= ($_GET['action'] ?? 'home') === 'home' ? 'active' : '' ?>">
             <i class="bi bi-house-door"></i>
             Accueil
         </a>
 
-        <!-- PRODUITS : admin / responsable_stock / magasinier -->
-        <?php if (in_array($_SESSION['user']['role_name'], ['admin', 'responsable_stock', 'magasinier'])): ?>
+        <?php if (in_array($_SESSION['user']['role_name'], ['admin','responsable_stock','magasinier'])): ?>
             <a href="index.php?action=products"
                class="<?= ($_GET['action'] ?? '') === 'products' ? 'active' : '' ?>">
                 <i class="bi bi-box-seam"></i>
@@ -185,8 +193,7 @@
             </a>
         <?php endif; ?>
 
-        <!-- CATEGORIES : admin / responsable_stock -->
-        <?php if (in_array($_SESSION['user']['role_name'], ['admin', 'responsable_stock'])): ?>
+        <?php if (in_array($_SESSION['user']['role_name'], ['admin','responsable_stock'])): ?>
             <a href="index.php?action=categories"
                class="<?= ($_GET['action'] ?? '') === 'categories' ? 'active' : '' ?>">
                 <i class="bi bi-tags"></i>
@@ -194,16 +201,29 @@
             </a>
         <?php endif; ?>
 
-        <!-- VENTE : admin / vendeur / caissier -->
-        <?php if (in_array($_SESSION['user']['role_name'], ['admin', 'vendeur', 'caissier'])): ?>
+        <?php if (in_array($_SESSION['user']['role_name'], ['admin','vendeur','caissier'])): ?>
             <a href="index.php?action=sales"
                class="<?= ($_GET['action'] ?? '') === 'sales' ? 'active' : '' ?>">
                 <i class="bi bi-cash-coin"></i>
                 Vente
             </a>
+
+            <a href="index.php?action=customer"
+               class="<?= ($_GET['action'] ?? '') === 'customer' ? 'active' : '' ?>">
+                <i class="bi bi-person-lines-fill"></i>
+                Clients
+            </a>
         <?php endif; ?>
 
-        <!-- UTILISATEURS : admin -->
+        <!-- ✅ SUPPLIER AJOUTÉ ICI (SANS RIEN CASSER) -->
+        <?php if (in_array($_SESSION['user']['role_name'], ['admin','responsable_stock'])): ?>
+            <a href="index.php?action=supplier"
+               class="<?= ($_GET['action'] ?? '') === 'supplier' ? 'active' : '' ?>">
+                <i class="bi bi-truck"></i>
+                Fournisseurs
+            </a>
+        <?php endif; ?>
+
         <?php if ($_SESSION['user']['role_name'] === 'admin'): ?>
             <a href="index.php?action=users"
                class="<?= ($_GET['action'] ?? '') === 'users' ? 'active' : '' ?>">
@@ -214,9 +234,8 @@
 
     </nav>
 
-    <!-- FOOTER SIDEBAR -->
     <div class="sidebar-footer">
-        <div class="mb-1">
+        <div>
             Connecté en tant que<br>
             <strong><?= htmlspecialchars($_SESSION['user']['name']) ?></strong>
         </div>

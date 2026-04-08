@@ -31,6 +31,18 @@
                         </a>
                     </li>
                     <li>
+                        <a href="index.php?action=customer" class="footer-link">
+                            <i class="bi bi-person-lines-fill"></i>
+                            Clients
+                        </a>
+                    </li>
+                    <li>
+                        <a href="index.php?action=supplier" class="footer-link">
+                            <i class="bi bi-truck"></i>
+                            Fournisseurs
+                        </a>
+                    </li>
+                    <li>
                         <a href="index.php?action=users" class="footer-link">
                             <i class="bi bi-people"></i>
                             Utilisateurs
@@ -65,6 +77,3 @@
         </div>
     </div>
 </footer>
-
-</body>
-</html>

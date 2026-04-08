@@ -53,6 +53,14 @@ class Category
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute(['id'=>$id]);
     }
+
+    public function countAll()
+    {
+        $sql = "SELECT COUNT(*) AS total FROM categories";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetch()['total'];
+    }
+
 }
 
 

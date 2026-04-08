@@ -17,6 +17,8 @@ require_once './App/Models/Products.php';
 require_once './App/Models/Category.php';
 require_once './App/Models/User.php';
 require_once './App/Models/Sale.php';
+require_once './App/Models/Customer.php';
+require_once './App/Models/Supplier.php';
 
 // ================= CONTROLLERS =================
 require_once './App/Controllers/ControllerProduct.php';
@@ -25,14 +27,18 @@ require_once './App/Controllers/ControllerUser.php';
 require_once './App/Controllers/ControllerHome.php';
 require_once './App/Controllers/ControllerAuth.php';
 require_once './App/Controllers/ControllerSale.php';
+require_once './App/Controllers/ControllerCustomer.php';
+require_once './App/Controllers/ControllerSupplier.php';
 
 // ================= INSTANCES =================
-$controllerProduct  = new ControllerProduct();
-$controllerCategory = new ControllerCategory();
-$controllerUser     = new ControllerUser();
-$controllerHome     = new ControllerHome();
-$controllerAuth     = new ControllerAuth();
-$controllerSale     = new ControllerSale();
+$controllerProduct   = new ControllerProduct();
+$controllerCategory  = new ControllerCategory();
+$controllerUser      = new ControllerUser();
+$controllerHome      = new ControllerHome();
+$controllerAuth      = new ControllerAuth();
+$controllerSale      = new ControllerSale();
+$controllerCustomer  = new ControllerCustomer();
+$controllerSupplier  = new ControllerSupplier();
 
 // ================= ROUTER =================
 switch ($action) {
@@ -76,7 +82,6 @@ switch ($action) {
         $controllerProduct->delete();
         break;
 
-    // ---------- SCAN CODE BARRE ----------
     case 'product-scan':
         $controllerProduct->scan();
         break;
@@ -98,7 +103,7 @@ switch ($action) {
         $controllerCategory->delete();
         break;
 
-    // ---------- SALES / POS ----------
+    // ---------- SALES ----------
     case 'sales':
         $controllerSale->index();
         break;
@@ -123,12 +128,11 @@ switch ($action) {
         $controllerSale->mySales();
         break;
 
-    // ---------- INVOICE HTML ----------
+    // ---------- INVOICE ----------
     case 'invoice':
         require './App/Views/Sales/invoice.php';
         break;
 
-    // ---------- INVOICE PDF ----------
     case 'invoice-pdf':
         require './App/Views/Sales/invoice_pdf.php';
         break;
@@ -158,9 +162,43 @@ switch ($action) {
         $controllerUser->deactivate();
         break;
 
+    // ---------- CUSTOMER ----------
+    case 'customer':
+        $controllerCustomer->index();
+        break;
+
+    case 'customer-store':
+        $controllerCustomer->store();
+        break;
+
+    case 'customer-update':
+        $controllerCustomer->update();
+        break;
+
+    case 'customer-delete':
+        $controllerCustomer->delete();
+        break;
+
+    // ---------- SUPPLIER ----------
+    case 'supplier':
+        $controllerSupplier->index();
+        break;
+
+    case 'supplier-store':
+        $controllerSupplier->store();
+        break;
+
+    case 'supplier-update':
+        $controllerSupplier->update();
+        break;
+
+    case 'supplier-delete':
+        $controllerSupplier->delete();
+        break;
+
     // ---------- 404 ----------
     default:
         http_response_code(404);
-        echo "<h1>404 - Page introuvable</h1>";
+        echo '<h1>404 - Page introuvable</h1>';
         break;
 }
