@@ -10,6 +10,24 @@ class User
         $this->pdo = $database->getConnection();
     }
 
+    // ================= GET USER BY ID =================
+    public function findById($id)
+    {
+    $sql = "
+        SELECT u.*, r.name AS role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE u.id = :id
+        LIMIT 1
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([':id' => $id]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
     // ================= GET ALL USERS =================
     public function getAll()
     {
@@ -64,6 +82,25 @@ class User
             ':id'      => $data['id']
         ]);
     }
+    // ================= UPDATE PROFILE (USER SETTINGS) =================
+    public function updateProfile($id, $data)
+    {
+    $sql = "
+        UPDATE users
+        SET name = :name,
+            email = :email
+        WHERE id = :id
+    ";
+
+    $stmt = $this->pdo->prepare($sql);
+
+    return $stmt->execute([
+        ':name'  => $data['name'],
+        ':email' => $data['email'],
+        ':id'    => $id
+    ]);
+    }
+
 
     // ================= UPDATE PASSWORD =================
     public function updatePassword($id, $password)

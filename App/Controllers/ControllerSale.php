@@ -1,6 +1,7 @@
 <?php
 require_once './App/Models/Sale.php';
 require_once './App/Models/Products.php';
+require_once './App/Models/ActivityLog.php';
 
 class ControllerSale
 {
@@ -89,39 +90,48 @@ class ControllerSale
         exit;
     }
 
-    // ================= VALIDER LA VENTE =================
-    public function store()
-    {
-        if (!isset($_SESSION['user'])) {
-            header('Location: index.php?action=login');
-            exit;
-        }
-
-        if (empty($_SESSION['cart'])) {
-            header('Location: index.php?action=sales&error=panier_vide');
-            exit;
-        }
-
-        // RÉCUPÉRATION DU MOYEN DE PAIEMENT
-        $paymentMethod = $_POST['payment_method'] ?? 'cash';
-
-        try {
-            $saleId = $this->saleModel->createInvoice(
-                $_SESSION['cart'],
-                $_SESSION['user']['id'],
-                $paymentMethod
-            );
-
-            unset($_SESSION['cart']);
-
-            header('Location: index.php?action=invoice&id=' . $saleId);
-            exit;
-
-        } catch (Exception $e) {
-            header('Location: index.php?action=sales&error=' . urlencode($e->getMessage()));
-            exit;
-        }
+// ================= VALIDER LA VENTE =================
+public function store()
+{
+    if (!isset($_SESSION['user'])) {
+        header('Location: index.php?action=login');
+        exit;
     }
+
+    if (empty($_SESSION['cart'])) {
+        header('Location: index.php?action=sales&error=panier_vide');
+        exit;
+    }
+
+    $paymentMethod = $_POST['payment_method'] ?? 'cash';
+
+    try {
+        $saleId = $this->saleModel->createInvoice(
+            $_SESSION['cart'],
+            $_SESSION['user']['id'],
+            $paymentMethod
+        );
+
+        //  JOURNAL DES ACTIONS (AVANT REDIRECTION)
+        $log = new ActivityLog();
+        $log->log([
+            'user_id'    => $_SESSION['user']['id'],
+            'action'     => 'Création',
+            'module'     => 'Vente',
+            'description'=> 'Nouvelle vente enregistrée (ID : ' . $saleId . ')'
+        ]);
+
+        unset($_SESSION['cart']);
+
+        header('Location: index.php?action=invoice&id=' . $saleId);
+        exit;
+
+    } catch (Exception $e) {
+        header('Location: index.php?action=sales&error=' . urlencode($e->getMessage()));
+        exit;
+    }
+}
+    
 
     // ================= MES VENTES =================
     public function mySales()

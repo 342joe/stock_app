@@ -232,6 +232,25 @@ if (empty($_SESSION['csrf_token'])) {
             </a>
         <?php endif; ?>
 
+        <!-- ---------- PROFIL / PARAMÈTRES (TOUS LES USERS) ---------- -->
+        <a href="index.php?action=profile"
+            class="<?= in_array(($_GET['action'] ?? ''), ['profile','profile-update','profile-password']) ? 'active' : '' ?>">
+            <i class="bi bi-gear"></i>
+                Paramètres
+        </a>
+
+        
+        <!-- ---------- JOURNAL (ADMIN UNIQUEMENT) ---------- -->
+        <?php if ($_SESSION['user']['role_name'] === 'admin'): ?>
+            <a href="index.php?action=logs"
+               class="<?= ($_GET['action'] ?? '') === 'logs' ? 'active' : '' ?>">
+                <i class="bi bi-list-check"></i>
+                Journal
+            </a>
+        <?php endif; ?>
+
+
+
     </nav>
 
     <div class="sidebar-footer">

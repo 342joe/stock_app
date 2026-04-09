@@ -16,9 +16,11 @@ if (!isset($_SESSION['user']) && !in_array($action, $publicActions)) {
 require_once './App/Models/Products.php';
 require_once './App/Models/Category.php';
 require_once './App/Models/User.php';
+require_once './App/Models/Role.php';
 require_once './App/Models/Sale.php';
 require_once './App/Models/Customer.php';
 require_once './App/Models/Supplier.php';
+require_once './App/Models/ActivityLog.php'; // ✅ LOGS
 
 // ================= CONTROLLERS =================
 require_once './App/Controllers/ControllerProduct.php';
@@ -29,6 +31,7 @@ require_once './App/Controllers/ControllerAuth.php';
 require_once './App/Controllers/ControllerSale.php';
 require_once './App/Controllers/ControllerCustomer.php';
 require_once './App/Controllers/ControllerSupplier.php';
+require_once './App/Controllers/ControllerLog.php'; // ✅ LOGS
 
 // ================= INSTANCES =================
 $controllerProduct   = new ControllerProduct();
@@ -39,6 +42,7 @@ $controllerAuth      = new ControllerAuth();
 $controllerSale      = new ControllerSale();
 $controllerCustomer  = new ControllerCustomer();
 $controllerSupplier  = new ControllerSupplier();
+$controllerLog       = new ControllerLog(); // ✅ LOGS
 
 // ================= ROUTER =================
 switch ($action) {
@@ -55,6 +59,13 @@ switch ($action) {
     case 'logout':
         $controllerAuth->logout();
         break;
+    // ---------- LANG ----------
+    case 'lang':
+        if (isset($_GET['lang']) && in_array($_GET['lang'], ['fr', 'en'])) {
+        $_SESSION['lang'] = $_GET['lang'];
+    }
+    header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
+    exit;
 
     // ---------- HOME ----------
     case 'home':
@@ -137,7 +148,7 @@ switch ($action) {
         require './App/Views/Sales/invoice_pdf.php';
         break;
 
-    // ---------- USERS ----------
+    // ---------- USERS (ADMIN) ----------
     case 'users':
         $controllerUser->index();
         break;
@@ -162,7 +173,20 @@ switch ($action) {
         $controllerUser->deactivate();
         break;
 
-    // ---------- CUSTOMER ----------
+    // ---------- PROFILE / SETTINGS (ALL USERS) ----------
+    case 'profile':
+        $controllerUser->profile();
+        break;
+
+    case 'profile-update':
+        $controllerUser->updateProfile();
+        break;
+
+    case 'profile-password':
+        $controllerUser->updateMyPassword();
+        break;
+
+    // ---------- CUSTOMERS ----------
     case 'customer':
         $controllerCustomer->index();
         break;
@@ -179,7 +203,7 @@ switch ($action) {
         $controllerCustomer->delete();
         break;
 
-    // ---------- SUPPLIER ----------
+    // ---------- SUPPLIERS ----------
     case 'supplier':
         $controllerSupplier->index();
         break;
@@ -194,6 +218,11 @@ switch ($action) {
 
     case 'supplier-delete':
         $controllerSupplier->delete();
+        break;
+
+    // ---------- ACTIVITY LOGS (ADMIN ONLY) ----------
+    case 'logs':
+        $controllerLog->index();
         break;
 
     // ---------- 404 ----------

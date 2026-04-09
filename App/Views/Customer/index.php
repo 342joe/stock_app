@@ -32,12 +32,12 @@ body {
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="mb-1">Clients</h4>
-        <small class="text-muted">Manage your customers</small>
+        <small class="text-muted">Gestion des clients</small>
     </div>
 
     <?php if (in_array($_SESSION['user']['role_name'], ['admin', 'manager'])): ?>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
-            + Create customer
+            + Ajouter un client
         </button>
     <?php endif; ?>
 </div>
@@ -48,10 +48,10 @@ body {
 <thead>
 <tr>
     <th>ID</th>
-    <th>Name</th>
-    <th>Phone</th>
-    <th>Address</th>
-    <th>Created</th>
+    <th>Nom</th>
+    <th>Téléphone</th>
+    <th>Adresse</th>
+    <th>Date de création</th>
     <th class="text-end">Actions</th>
 </tr>
 </thead>
@@ -107,7 +107,9 @@ body {
 <?php endforeach; ?>
 <?php else: ?>
 <tr>
-    <td colspan="6" class="text-center text-muted">No customers found</td>
+    <td colspan="6" class="text-center text-muted">
+        Aucun client trouvé
+    </td>
 </tr>
 <?php endif; ?>
 </tbody>
@@ -125,35 +127,36 @@ body {
 <div class="modal-content">
 
 <div class="modal-header bg-success text-white">
-    <h5 class="modal-title">Create customer</h5>
+    <h5 class="modal-title">Ajouter un client</h5>
     <button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
 <div class="modal-body">
 <form action="index.php?action=customer-store" method="POST">
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+
     <div class="mb-3">
-        <label class="form-label">Name</label>
+        <label class="form-label">Nom</label>
         <input class="form-control" name="name" required>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Phone</label>
+        <label class="form-label">Téléphone</label>
         <input class="form-control" name="phone" required>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Address</label>
+        <label class="form-label">Adresse</label>
         <input class="form-control" name="address" required>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Created at</label>
+        <label class="form-label">Date de création</label>
         <input type="date" class="form-control" name="created_at" required>
     </div>
 
     <div class="text-end">
-        <button class="btn btn-success">Create</button>
+        <button class="btn btn-success">Créer</button>
     </div>
 </form>
 </div>
@@ -170,7 +173,7 @@ body {
 <div class="modal-content">
 
 <div class="modal-header bg-warning">
-    <h5 class="modal-title">Edit customer</h5>
+    <h5 class="modal-title">Modifier le client</h5>
     <button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
@@ -180,27 +183,27 @@ body {
     <input type="hidden" name="id" id="edit-id">
 
     <div class="mb-3">
-        <label class="form-label">Name</label>
+        <label class="form-label">Nom</label>
         <input class="form-control" name="name" id="edit-name" required>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Phone</label>
+        <label class="form-label">Téléphone</label>
         <input class="form-control" name="phone" id="edit-phone" required>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Address</label>
+        <label class="form-label">Adresse</label>
         <input class="form-control" name="address" id="edit-address" required>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Created at</label>
+        <label class="form-label">Date de création</label>
         <input type="date" class="form-control" name="created_at" id="edit-created" required>
     </div>
 
     <div class="text-end">
-        <button class="btn btn-warning">Update</button>
+        <button class="btn btn-warning">Mettre à jour</button>
     </div>
 </form>
 </div>
@@ -217,7 +220,7 @@ body {
 <div class="modal-content">
 
 <div class="modal-header bg-danger text-white">
-    <h5 class="modal-title">Delete customer</h5>
+    <h5 class="modal-title">Supprimer le client</h5>
     <button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
@@ -225,7 +228,8 @@ body {
 <form action="index.php?action=customer-delete" method="POST">
     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
     <input type="hidden" name="id" id="delete-id">
-    <button class="btn btn-danger w-100">Delete permanently</button>
+
+    <button class="btn btn-danger w-100">Supprimer définitivement</button>
 </form>
 </div>
 

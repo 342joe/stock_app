@@ -31,13 +31,13 @@ body {
 <!-- ================= HEADER ================= -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h4 class="mb-1">Categories</h4>
-        <small class="text-muted">Manage your product categories</small>
+        <h4 class="mb-1">Catégories</h4>
+        <small class="text-muted">Gestion des catégories de produits</small>
     </div>
 
     <?php if (in_array($_SESSION['user']['role_name'], ['admin', 'manager'])): ?>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
-            + Create category
+            + Ajouter une catégorie
         </button>
     <?php endif; ?>
 </div>
@@ -48,9 +48,9 @@ body {
 <thead>
 <tr>
     <th>ID</th>
-    <th>Name</th>
+    <th>Nom</th>
     <th>Description</th>
-    <th>Created</th>
+    <th>Date de création</th>
     <th class="text-end">Actions</th>
 </tr>
 </thead>
@@ -103,7 +103,9 @@ body {
 <?php endforeach; ?>
 <?php else: ?>
 <tr>
-    <td colspan="5" class="text-center text-muted">No categories found</td>
+    <td colspan="5" class="text-center text-muted">
+        Aucune catégorie trouvée
+    </td>
 </tr>
 <?php endif; ?>
 </tbody>
@@ -119,15 +121,17 @@ body {
 <div class="modal fade" id="createModal" tabindex="-1">
 <div class="modal-dialog">
 <div class="modal-content">
+
 <div class="modal-header bg-success text-white">
-    <h5 class="modal-title">Create category</h5>
+    <h5 class="modal-title">Ajouter une catégorie</h5>
     <button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
 <div class="modal-body">
 <form action="index.php?action=category-store" method="POST">
+
     <div class="mb-3">
-        <label class="form-label">Name</label>
+        <label class="form-label">Nom</label>
         <input class="form-control" name="name" required>
     </div>
 
@@ -137,10 +141,11 @@ body {
     </div>
 
     <div class="text-end">
-        <button class="btn btn-success">Create</button>
+        <button class="btn btn-success">Créer</button>
     </div>
 </form>
 </div>
+
 </div>
 </div>
 </div>
@@ -151,8 +156,9 @@ body {
 <div class="modal fade" id="editModal" tabindex="-1">
 <div class="modal-dialog modal-dialog-centered">
 <div class="modal-content">
+
 <div class="modal-header bg-warning">
-    <h5 class="modal-title">Edit category</h5>
+    <h5 class="modal-title">Modifier la catégorie</h5>
     <button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
@@ -161,7 +167,7 @@ body {
     <input type="hidden" name="id" id="edit-id">
 
     <div class="mb-3">
-        <label class="form-label">Name</label>
+        <label class="form-label">Nom</label>
         <input class="form-control" name="name" id="edit-name" required>
     </div>
 
@@ -171,10 +177,11 @@ body {
     </div>
 
     <div class="text-end">
-        <button class="btn btn-warning">Update</button>
+        <button class="btn btn-warning">Mettre à jour</button>
     </div>
 </form>
 </div>
+
 </div>
 </div>
 </div>
@@ -185,17 +192,19 @@ body {
 <div class="modal fade" id="deleteModal" tabindex="-1">
 <div class="modal-dialog">
 <div class="modal-content">
+
 <div class="modal-header bg-danger text-white">
-    <h5 class="modal-title">Delete category</h5>
+    <h5 class="modal-title">Supprimer la catégorie</h5>
     <button class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
 <div class="modal-body">
 <form action="index.php?action=category-delete" method="POST">
     <input type="hidden" name="id" id="delete-id">
-    <button class="btn btn-danger w-100">Delete permanently</button>
+    <button class="btn btn-danger w-100">Supprimer définitivement</button>
 </form>
 </div>
+
 </div>
 </div>
 </div>
