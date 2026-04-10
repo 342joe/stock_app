@@ -30,6 +30,10 @@ class ControllerSale
 
         $products = $this->productModel->getAvailableProducts();
         $cart = $_SESSION['cart'] ?? [];
+        $saleModel = new Sale();
+$sales = $saleModel->getSalesHistory();
+
+require 'views/sales/history.php';
 
         require './App/Views/Sales/index.php';
     }

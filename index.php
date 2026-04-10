@@ -20,7 +20,7 @@ require_once './App/Models/Role.php';
 require_once './App/Models/Sale.php';
 require_once './App/Models/Customer.php';
 require_once './App/Models/Supplier.php';
-require_once './App/Models/ActivityLog.php'; // ✅ LOGS
+require_once './App/Models/ActivityLog.php'; 
 
 // ================= CONTROLLERS =================
 require_once './App/Controllers/ControllerProduct.php';
@@ -31,7 +31,7 @@ require_once './App/Controllers/ControllerAuth.php';
 require_once './App/Controllers/ControllerSale.php';
 require_once './App/Controllers/ControllerCustomer.php';
 require_once './App/Controllers/ControllerSupplier.php';
-require_once './App/Controllers/ControllerLog.php'; // ✅ LOGS
+require_once './App/Controllers/ControllerLog.php'; 
 
 // ================= INSTANCES =================
 $controllerProduct   = new ControllerProduct();
@@ -42,7 +42,7 @@ $controllerAuth      = new ControllerAuth();
 $controllerSale      = new ControllerSale();
 $controllerCustomer  = new ControllerCustomer();
 $controllerSupplier  = new ControllerSupplier();
-$controllerLog       = new ControllerLog(); // ✅ LOGS
+$controllerLog       = new ControllerLog(); 
 
 // ================= ROUTER =================
 switch ($action) {
@@ -137,6 +137,9 @@ switch ($action) {
 
     case 'my-sales':
         $controllerSale->mySales();
+        break;
+    case 'sales_history':
+        $controllerSale->history();
         break;
 
     // ---------- INVOICE ----------

@@ -6,17 +6,25 @@
 <div class="saas-card">
 
     <!-- ================= HEADER ================= -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h4 class="mb-1">
-                <i class="bi bi-cash-coin"></i>
-                Vente de produits
-            </h4>
-            <small class="text-muted">
-                Ajouter des produits au panier puis générer la facture
-            </small>
-        </div>
+ <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="mb-1">
+            <i class="bi bi-cash-coin"></i>
+            Vente de produits
+        </h4>
+        <small class="text-muted">
+            Ajouter des produits au panier puis générer la facture
+        </small>
     </div>
+
+    <!-- BOUTON HISTORIQUE -->
+    <?php if (in_array($_SESSION['user']['role_name'], ['admin','responsable_stock'])): ?>
+        <a href="index.php?action=sales-history" class="btn btn-outline-secondary">
+            <i class="bi bi-clock-history"></i>
+            Historique des ventes
+        </a>
+    <?php endif; ?>
+</div>
 
     <!-- ================= ALERTS ================= -->
     <?php if (isset($_GET['error'])): ?>

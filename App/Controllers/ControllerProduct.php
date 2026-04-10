@@ -2,6 +2,7 @@
 
 require_once './App/Models/Products.php';
 require_once './App/Models/Category.php';
+require_once './App/Models/ActivityLog.php';
 
 
 class ControllerProduct
@@ -29,7 +30,7 @@ class ControllerProduct
         $totalProducts = $this->productModel->countProducts();
         $stockValue = $this->productModel->stockValue();
         $productsByCategory = $this->productModel->productsByCategory();
-        $lowStock = $this->productModel->lowStock();
+        $lowStock = $this->productModel->lowStock();+
 
         require './App/Views/Product/index.php';
     }
@@ -55,6 +56,14 @@ class ControllerProduct
             ];
 
             $result = $this->productModel->create($data);
+            $log = new ActivityLog();
+            $log->log([
+                'user_id' => $_SESSION['user']['id'],
+                'action'  => 'creation',
+                'module'  => 'Produit',
+                'description' =>'Nouvelle produit enregistrée (ID : ' . $result . ')'
+
+            ]);
 
             if ($result) {
                 header("Location: index.php?action=products");
@@ -84,9 +93,16 @@ class ControllerProduct
             ];
 
             $result = $this->productModel->update($data);
+            $log = new ActivityLog();
+            $log->log([
+                'user_id' => $_SESSION['user']['id'],
+                'action'  => 'Création',
+                'module'  => 'Produit_UPDATE',
+                'description' => 'Modification du produit ID : ' .$_POST['id']
+            ]);
 
             if ($result) {
-                echo "Produit mis à jour avec succès";
+                 header('Location: index.php?action=products');
             } else {
                 echo "Erreur lors de la mise à jour";
             }
@@ -105,6 +121,13 @@ class ControllerProduct
             $id = $_POST['id'];
 
             $result = $this->productModel->delete($id);
+            $log = new ActivityLog();
+            $log->log([
+                'user_id' => $_SESSION['user']['id'],
+                'action'  => 'PRODUIT_DELETE',
+                'module'  => 'PRODUCT',
+                'description' => 'Suppression du produit ID : ' . $id
+            ]);
 
             if ($result) {
                 header("Location: index.php?action=products");
@@ -160,5 +183,23 @@ class ControllerProduct
         echo json_encode(['success' => false]);
     }
 }
+
+    // ================= HISTORIQUE GLOBAL =================
+    public function history()
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: index.php?action=login');
+            exit;
+        }
+
+        $role = $_SESSION['user']['role_name'];
+        if (!in_array($role, ['admin', 'responsable_stock'])) {
+            http_response_code(403);
+            die('Accès interdit');
+        }
+
+        $sales = $this->productModel->getAll();
+        require './App/Views/Sales/history.php';
+    }
 
 }
