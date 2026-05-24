@@ -31,11 +31,11 @@ class ControllerSale
         $products = $this->productModel->getAvailableProducts();
         $cart = $_SESSION['cart'] ?? [];
         $saleModel = new Sale();
-$sales = $saleModel->getSalesHistory();
-
-require 'views/sales/history.php';
+        $sales = $saleModel->getSalesHistory();
 
         require './App/Views/Sales/index.php';
+
+        // require './App/Views/Sales/history.php';
     }
 
     // ================= AJOUT AU PANIER =================
@@ -163,7 +163,7 @@ public function store()
             die('Accès interdit');
         }
 
-        $sales = $this->saleModel->getAll();
+        $sales = $this->saleModel->getSalesHistory();
         require './App/Views/Sales/history.php';
     }
 }
