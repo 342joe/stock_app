@@ -42,6 +42,6 @@
 </div>
 </div>
 
-    <?php include 'App/Views/Layout/footer.php'; ?>
+<?php include 'App/Views/Layout/footer.php'; ?>
 
     
